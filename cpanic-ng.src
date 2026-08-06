@@ -1,31 +1,31 @@
+home = get_shell.host_computer
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-//loading config file
+//loading config file and libs, if no config file then create one
 init = function()
+
 	clear_screen
 	print("[i] loading config file...")
 	
-	configFile = get_shell.host_computer.File("/root/Config/cpanic.txt")
+	configFile = home.File("/root/Config/cpanic.txt")
 	
 	if not configFile then
-		touch("/root/Config/cpanic.txt")
-	end if
-
-	print("config file contents: " +char(10)+ configFile.get_content)
+		print("[!] no config file found")
+		get_shell("root","precial").host_computer.touch("/root/Config/","cpanic.txt")
+		print("[i] config file created in /root/Config/")
+	else
+	
 	configFileOldContent = configFile.get_content
+	print("debug: config file contents: " +char(10)+ configFile.get_content)
 	configFile.set_content(configFileOldContent + char(10) + "1")
+	end if
+	
+	crypto = include_lib(current_path+"crypto.so")
+	if not crypto then crypto = include_lib("/lib/crypto.so")
+	if not crypto then print("[!] dependency crypto.so not found")
+	
+	meta = include_lib(current_path+"metaxploit.so")
+	if not meta then meta = include_lib("/lib/metaxploit.so")
+	if not meta then print("[!] dependency metaxploit.so not found in current directory or /lib")
 	
 end function
 
@@ -34,7 +34,6 @@ end function
 //list commands in /bin and use launch rather than scripting every single one
 commandHandler = function(cmd)
 print("debug: entered command is "+cmd)
-get_shell.host_computer
 
 end function
 
