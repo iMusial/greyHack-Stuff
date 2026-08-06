@@ -1,0 +1,48 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//loading config file
+init = function()
+	clear_screen
+	print("[i] loading config file...")
+	
+	configFile = get_shell.host_computer.File("/root/Config/cpanic.txt")
+	
+	if not configFile then
+		touch("/root/Config/cpanic.txt")
+	end if
+
+	print("config file contents: " +char(10)+ configFile.get_content)
+	configFileOldContent = configFile.get_content
+	configFile.set_content(configFileOldContent + char(10) + "1")
+	
+end function
+
+//define functions
+
+//list commands in /bin and use launch rather than scripting every single one
+commandHandler = function(cmd)
+print("debug: entered command is "+cmd)
+get_shell.host_computer
+
+end function
+
+//the "shell"
+init()
+
+while true
+cmd = user_input(">")
+commandHandler(cmd)
+end while
+
