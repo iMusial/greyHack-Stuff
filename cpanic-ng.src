@@ -4,6 +4,63 @@ homeComputer = get_shell.host_computer
 init = function()
 
 	print("[i] loading config file...")
+	configFile = homeComputer.File(home_dir+"/Config/cpanic.txt")
+	
+	if not configFile or configFile == "null" then
+		print("[!] no config file found")
+		print("[i] attempting to create config file at " + home_dir + "/Config")
+		
+		homeComputer.touch(home_dir+"/Config/","cpanic.txt")
+		print(typeof(File(home_dir+"/Config/cpanic.txt")))
+		homeComputer.File(home_dir+"/Config/cpanic.txt").set_content("1")
+		print("[i] config file created in " + home_dir + "/Config")
+	else
+	
+	if typeof(configFile) == "file" then
+	print("debug: config file contents: " + configFile.get_content)
+	memConfigFileCurrentContents = configFile.get_content // saving the current contents of the config file to "memory" (larp), then modifying it
+	configFile.set_content(memConfigFileCurrentContents + "1")
+	globals.configFile = configFile
+	end if
+
+
+	print("[i] loading dependencies")
+	crypto = include_lib(current_path+"crypto.so")
+	if not crypto then crypto = include_lib("/lib/crypto.so")
+	if not crypto then print("[!] dependency crypto.so not found")
+	
+	meta = include_lib(current_path+"metaxploit.so")
+	if not meta then meta = include_lib("/lib/metaxploit.so")
+	if not meta then print("[!] dependency metaxploit.so not found in current directory or /lib")
+	
+	print("[+] success!")
+	if globals.configFile.get_content == "1" then print("[i] It seems like this is your first time, run '?' for help")
+	//clear_screen
+	
+	//todo: set a default list of configurations
+end function
+
+//define functions
+
+//list commands in /bin and use launch rather than scripting every single one
+commandHandler = function(cmd)
+print("debug: entered command is " + cmd)
+
+end function
+
+//the "shell"
+init()
+
+while true
+cmd = user_input(">")
+commandHandler(cmd)
+end while
+homeComputer = get_shell.host_computer
+
+//loading config file and libs, if no config file then create one
+init = function()
+
+	print("[i] loading config file...")
 	
 	configFile = homeComputer.File(home_dir+"/Config/cpanic.txt")
 	print(typeof(configFile))
