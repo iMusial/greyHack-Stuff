@@ -1,50 +1,50 @@
-homeComputer = get_shell.host_computer
+home = get_shell.host_computer
 
 //loading config file and libs, if no config file then create one
 init = function()
 
-	print("[i] loading config file...")
-	configFile = homeComputer.File(home_dir+"/Config/cpanic.txt")
+	clear_screen
 	
-	if not configFile or configFile == "null" then
-		print("[!] no config file found")
-		print("[i] attempting to create config file at " + home_dir + "/Config")
-		
-		homeComputer.touch(home_dir+"/Config/","cpanic.txt")
-		print(typeof(File(home_dir+"/Config/cpanic.txt")))
-		homeComputer.File(home_dir+"/Config/cpanic.txt").set_content("1")
-		print("[i] config file created in " + home_dir + "/Config")
-	else
-	
-	if typeof(configFile) == "file" then
-	print("debug: config file contents: " + configFile.get_content)
-	memConfigFileCurrentContents = configFile.get_content // saving the current contents of the config file to "memory" (larp), then modifying it
-	configFile.set_content(memConfigFileCurrentContents + "1")
-	globals.configFile = configFile
-	end if
-
-
-	print("[i] loading dependencies")
 	crypto = include_lib(current_path+"crypto.so")
 	if not crypto then crypto = include_lib("/lib/crypto.so")
-	if not crypto then print("[!] dependency crypto.so not found")
+	if not crypto then print("[!] dependency crypto.so not found current directory or /lib")
 	
 	meta = include_lib(current_path+"metaxploit.so")
 	if not meta then meta = include_lib("/lib/metaxploit.so")
 	if not meta then print("[!] dependency metaxploit.so not found in current directory or /lib")
-	
-	print("[+] success!")
-	if globals.configFile.get_content == "1" then print("[i] It seems like this is your first time, run '?' for help")
-	//clear_screen
-	
-	//todo: set a default list of configurations
+		
 end function
 
 //define functions
+help = function()
+	print("cpanic help page:\n")
+    print("scan\nadds an IP to your NetMap, issues an ICMP echo ping")
+    print("\nconnect\nSets a target IP and connects to the NetMap if not already added")
+	print("\nprobe\nCommon port scanning")
+    print("\ndisconnect\nunsets current target from an earlier 'connect' command")
+    print("\nanalyze\nscans all 65,536 ports and service versions, best used before analyze")
+    print("\nsolve\nrequires analyze to be run first, recommends an attack vector by checking service versions for CVEs, and other misconfigurations like anonymous ftp logins or overly-verbose responses")
+    print("\nclear\nclears the terminal")
+    print("\nnote\nusage: note [add,rm,edit, list] <filename>\nlets the user quickly add a note located in /home/documents/cpanicNotes")
+    print("\nsave\n saves current session data like nmap scans, analyze outputs, and target info to a text document that can be used to resume the engagement\n")
+end function
 
 //list commands in /bin and use launch rather than scripting every single one
-commandHandler = function(cmd)
-print("debug: entered command is " + cmd)
+commandHandler = function(preParsedCmd)
+
+commandsList=["help", "scan", "exit"] //list of valid commands with functions
+separatedAwaitingParsing = preParsedCmd.split(" ") //separates the users blob into a list by spaces " "
+cmd = separatedAwaitingParsing[0] //grabs the first index of the split user blob
+
+validCommand = false
+for command in commandsList
+	if cmd == command then validCommand = true
+end for
+
+test={"help":help()}
+test.cmd
+
+if not validCommand then print("unknown command: " + cmd)
 
 end function
 
@@ -52,58 +52,6 @@ end function
 init()
 
 while true
-cmd = user_input(">")
-commandHandler(cmd)
-end while
-homeComputer = get_shell.host_computer
-
-//loading config file and libs, if no config file then create one
-init = function()
-
-	print("[i] loading config file...")
-	
-	configFile = homeComputer.File(home_dir+"/Config/cpanic.txt")
-	print(typeof(configFile))
-	
-	if not configFile then
-		print("[!] no config file found")
-		print("[i] attempting to create config file at " + home_dir + "/Config")
-		homeComputer.touch(home_dir+"/Config","cpanic.txt")
-		configFile.set_content(configFileOldContent + char(10) + "1") // temporary, checking if i can save stuff to the config file
-		print("[i] config file created in " + home_dir + "/Config")
-		
-	else
-	
-	configFileOldContent = configFile.get_content
-	print("debug: config file contents: " + char(10) + configFile.get_content)
-	end if
-	print("[i] loading dependencies")
-	crypto = include_lib(current_path+"crypto.so")
-	if not crypto then crypto = include_lib("/lib/crypto.so")
-	if not crypto then print("[!] dependency crypto.so not found")
-	
-	meta = include_lib(current_path+"metaxploit.so")
-	if not meta then meta = include_lib("/lib/metaxploit.so")
-	if not meta then print("[!] dependency metaxploit.so not found in current directory or /lib")
-	
-	print("[+] success!")
-	//clear_screen
-	
-	//todo: set a default list of configurations
-end function
-
-//define functions
-
-//list commands in /bin and use launch rather than scripting every single one
-commandHandler = function(cmd)
-print("debug: entered command is " + cmd)
-
-end function
-
-//the "shell"
-init()
-
-while true
-cmd = user_input(">")
-commandHandler(cmd)
+preParsedCmd = user_input(">")
+commandHandler(preParsedCmd)
 end while
