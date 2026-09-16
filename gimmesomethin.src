@@ -1,0 +1,88 @@
+isParams = null
+if params.len > 0 then
+	isParams = true  //if the command is ran with parameters, set to true
+	print("params")
+	if params[0] == "-h" or params[0] == "--help" then exit("localsploit usage:" + char(10) + "localsploit <opt: library file>")
+else
+	isParams = false
+	print("use -h or --help for help, otherwise localsploit is starting now!")
+	
+	for i in range(1,3)
+	wait(.8)
+	print(i)
+	end for
+
+end if
+
+metaxploit = include_lib("/lib/metaxploit.so")
+if not metaxploit then exit("Error: Missing metaxploit library")
+
+//globals
+vulnInfo = [] //to assess later, params or not
+memZones = [] //same as above, used in pair
+libs = [] //used if no params
+
+if isParams == true then
+
+	pathLib = get_abs_path(params[0]) //receives a relative path and returns an absolute path
+	libFile = get_shell.host_computer.File(pathLib) //uses that absolute path to load the library file as a File object
+	if libFile.has_permission("r") != true then exit("insufficient privilege")
+
+	
+	metaLib = metaxploit.load(libFile.path)
+	if not metaLib then exit(libFile.name + " is not a library file.") else print("scanning " + libFile.name)
+
+	i=0
+	globals.memZones = metaxploit.scan(metaLib) //returns list of memory zones
+	for memZone in memZones
+		vulnInfo.push(metaxploit.scan_address(metaLib, memZones[i])) //returns an insecure value and information on the exploit, adding it to a list
+		i = i + 1
+	end for
+end if
+
+//verify permission to /lib if no path supplied
+if isParams == false then
+
+	folder = get_shell.host_computer.File("/lib")
+	if folder.has_permission("r") != true then exit("insufficient privilege to /lib") //testing if the script can open /lib
+
+if folder.is_folder then
+   files = folder.get_files
+   for file in files
+        print("found library files " + file.name)
+		//at to a list of libfiles
+   end for
+else
+exit("/lib is not a folder...?")
+end if
+end if
+
+//begin parsing vulnInfo and extracting memory zone: insecure value pairs and a short description of the exploit
+if memZones != [] then
+	
+	//vulnInfo is a list of strings containing vulns for each mem zone, iterate together with memzones.len
+	
+wait(2)
+segments=[]
+vulnVals=[]
+	for i in range(vulnInfo.len)
+		segments = segments.push(vulnInfo[i-1].split("Unsafe check: ")) //chunks the output starting at each instance of "unsafe check:" into a last
+	end for
+
+	exploit = null
+	for segment in segments
+
+    	labelStart = segment.indexOf("<b>") //every vuln is bolded, this marks the beginning infex of the vuln val
+    	labelEnd = segment.indexOf("</b>") //every vuln has a remove bold tag, this marks the end of the vuln val
+
+  		exploit = segment[labelStart + 3: labelEnd] //extracted vuln val, the +3 is the offset for "<b>"
+		vulnVals.push(exploit)// add the extracted vuln val to a list
+		print(vulnVals)
+	end for
+	
+for i in range (1,memZones.len)
+		//print(memZones[i-1] + char(10) + vulnInfo[i-1])
+end for
+
+	//end for
+end if
