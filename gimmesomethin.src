@@ -1,12 +1,14 @@
 isParams = null
+print(testMap)
 if params.len > 0 then
-	isParams = true  //if the command is ran with parameters, set to true
+	isParams = true
 	print("params")
 	if params[0] == "-h" or params[0] == "--help" then exit("localsploit usage:" + char(10) + "localsploit <opt: library file>")
 else
 	isParams = false
 	print("use -h or --help for help, otherwise localsploit is starting now!")
 	
+	//countdown
 	for i in range(1,3)
 	wait(.8)
 	print(i)
@@ -18,17 +20,17 @@ metaxploit = include_lib("/lib/metaxploit.so")
 if not metaxploit then exit("Error: Missing metaxploit library")
 
 //globals
-vulnInfo = [] //to assess later, params or not
-memZones = [] //same as above, used in pair
+vulnInfo = [] 
+memZones = []
 libs = [] //used if no params
 
+//                                                                  === YES PARAMS ===
 if isParams == true then
 
 	pathLib = get_abs_path(params[0]) //receives a relative path and returns an absolute path
 	libFile = get_shell.host_computer.File(pathLib) //uses that absolute path to load the library file as a File object
 	if libFile.has_permission("r") != true then exit("insufficient privilege")
 
-	
 	metaLib = metaxploit.load(libFile.path)
 	if not metaLib then exit(libFile.name + " is not a library file.") else print("scanning " + libFile.name)
 
@@ -40,6 +42,7 @@ if isParams == true then
 	end for
 end if
 
+//                                                                  === NO PARAMS ===
 //verify permission to /lib if no path supplied
 if isParams == false then
 
@@ -60,8 +63,9 @@ end if
 //begin parsing vulnInfo and extracting memory zone: insecure value pairs and a short description of the exploit
 if memZones != [] then
 	
-	//vulnInfo is a list of strings containing vulns for each mem zone, iterate together with memzones.len
+	//vulnInfo is a list of strings containing unparsed vulnerable values and info for each mem zone, iterate together with memzones.len
 	
+//                                                                  === PARSE VULNS+INFO AND LINK MEM ZONES ===
 wait(2)
 segments=[]
 vulnVals=[]
