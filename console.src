@@ -1,42 +1,9 @@
-//                         //////////////////////// PARAM MANAGEMENT AND RUNTIME COMMAND PROCESSING FUNCTIONS //////////////////////////////
-//
-//                            ______________________________________________________________________________________________
-//							  \
-//							  \        I hate to say it, but it's time...
-//							  \        * create a system that can establish a remote session and carry that info into commands
-//							  \
-//							  \        ideas:
-//							  \        *don't even bohter LMAO
-//							  \        * explore custom classes
-//							  \        * how does doom do it?
-//							  \        * get_shell_host_computer returns a computer object
-//							  \        !! get_shell.connect_service(info) returns a shell !!
-//							  \
-//							  \        I think the best option is having a computer shell and the option to drop into a true shell
-//							  \        a computer shell uses the router to get computer objects
-//							  \
-//							  \
-//							  \        homeShell = get_shell.host_computer
-//							  \        homeShell
-//							  \
-//							  \        include a exploit searching function that tests every local library on the remote machine
-//							  \        instead of having a function for EVERY core command, instead match the name to the binary already on the system
-//							  \	       
-//							  \        implement a payload detecting feature instead of just throwing up successful exploits
-//							  \	       "shell: root" rather than all the insane text
-//							  \
-//							  \
-
-
-//IP: 75.239.93.39
-//user: root
-//password: catf
 homeComputerShell = get_shell
 
 console = function()
 currentUser = active_user
 
-//action = user_input(currentUser +":" + current_path + "> ")                "the shell"
+//                                                 "the shell"
 action = user_input(currentUser + "> ", false, false , true)
 checkParams(action)
 
@@ -48,7 +15,7 @@ end function
 //                                "command, flag, and param discovery"
 checkParams = function(x)
 params = x.split(" ")
-//for item in matches, do this
+
 //single command check
 if isCommand(params[0], true) == false then return print("unkown command: " + params[0])
 
@@ -63,42 +30,38 @@ for i in params
 		allSubParams.push(params[count]) //add param to a list of every single param provided
 
 		if params[count] == params[0] then
-			//print("command set: " + params[0])  //detect and set the current command
+			                                      //detect and set the current command
 			command = params[0]
 	end if
 
         if params[count].indexOf("-") == 0 then
-              //  print("flag detected!")         //detect and add the flag to a list of flags
+	                                              //detect and add the flag to a list of flags
                 flags.push(params[count])
 
 		else if params[count] != params[0] then
-		subparams.push(params[count])          //detect and add the  param to a list of params
-		//print("subparam detected!")
+		subparams.push(params[count])             //detect and add the param to a list of params
 	end if
 
-        //get the index of the detected flag, then add subsequent parameters into a list of 'subparameters' for the flag
-        //check if its a real flag, or treat it as a parameter
+        //get the index of the detected flag, then add following parameters into a list of arguments for the flag
+        //check if its a real flag, or treat it as an argument
         count = count + 1
 end for
-//print(char(10) + "command: " + params[0])
-//print("list of detected flags: " + flags)
-//print("list of detected subparams: " + subparams)
-//print("list of everything: " + allSubParams)
 isCommand(params[0], false, allSubParams)
 
 
-//now check the index of the flag and use sequential indexes as their parameter until the next flag
+
 end function
 
 
 
 //                            /////////////////////////// CORE CONSOLE COMMANDS //////////////////////////
 
-isCommand = function(x, ischeck, params)
-//                                "the yandaredev section"
-//if isCommand is detected as just a command check, it will simply do as the name suggests and NOT run the program erm
+isCommand = function(x, isCheck, params)
+
+//if isCommand is detected as just a command check, it will simply do as the name suggests and NOT run the program
+
 itIsCommand = false
-if ischeck == true then
+if isCheck == true then
 	if x == "?" or x == "help" then return true
 if x == "exit" then itIsCommand = true
 if x == "cat" then itIsCommand = true
@@ -124,7 +87,7 @@ if x == "ssh" then itIsCommand = true
 if x == "scan" then itIsCommand = true
 if x == "connect" then itIsCommand = true
 if x == "rshells" then itIsCommand = false
-if itIsCommand == true then return true
+if itIsCommand == true then return truef
 end if
 
 if x == "?" or x == "help" then return help(x)
@@ -151,7 +114,7 @@ if x == "whois" then return whodat()
 if x == "ssh" then return ssh()
 if x == "rshells" then return rshell_interface()
 if x == "connect" then return connect(params)
-//god help us all
+//god help us all 
 if x == "clear" then
 return clear()
 else
@@ -161,7 +124,7 @@ end if
 end function
 
 help = function(command)
-if not command then return print("dude idek what happened LMAOAOOOOO")
+if not command then return print("command not found or unknown error occured")
 print("todo: sort help page")
 print("available commands:")
 print("meterpreter core commands:")
@@ -170,13 +133,13 @@ print("search" + char(10) + "hashdump" + char(10) + "reboot" + char(10) + "rshel
 print("portfwd" + char(10) + "sysinfo" + char(10) + "getuid" + char(10) + "getsystem or getroot" + char(10) + "nmap" + char(10) + "scan"+ char(10) + "ssh" + char(10) + "connect")
 
 if command == "nmap" then
-print("hi im a help page for namp lol")
+print("help page for nmap")
 else
 if command == "scan" then
-	print("hi im a help page for scan lol")
+	print("help page for scan")
 else
 if command == "connect" then
-	print("hi im a help page for connect lol")
+	print("help page for connect")
 
 
 end if
@@ -187,7 +150,7 @@ scanlib = function(ip)
 //prompt for port num
 print("connect: enter a port number")
 
-continyou = true
+continyou = true //odd name is because "continue" is reserved by the compiler
 
 while continyou == true
 port = user_input("connect> ").to_int
@@ -200,11 +163,11 @@ end while
 
 
 net_session = metaxploit.net_use(ip, port)		// connects to provided IP address using metaxploit lib
-	// if connection is not established prints red text and exits
-print("Scanning")		// this will print text on screen
+// if connection is not established prints red text and exits
+print("Scanning")
 metaLib = net_session.dump_lib		// this will set ver metaLib to get to the connected library
-//INFO
-//workflow
+
+//planned workflow:
 //get a list of addresses
 //for every address in that list, scan that address for insecure values, extract the values, and test them along with the address
 
@@ -217,26 +180,27 @@ exploit = null
 vulnVals = []
 sploits = []
 x= 0
+
 for address in scanResult
 
 	addr = scanResult[spot] //address is set
 	scanInfo = metaxploit.scan_address(metaLib, addr)//string of INFO, using addr as the mem zone
-	segments = scanInfo.split("Unsafe check: ") //uhhh... yea
+	segments = scanInfo.split("Unsafe check: ") //scanInfo is a blob of text, for now until the game supports it, this is the method for getting each clump where an insecure value is mentioned
 	exploit = null
 
 	for segment in segments
 
-    	labelStart = segment.indexOf("<b>") //every vuln is bolded, this marks the beginning infex of the vuln val
-    	labelEnd = segment.indexOf("</b>") //every vuln has a remove bold tag, this marks the end of the vuln val
+    	labelStart = segment.indexOf("<b>") //every vuln is bolded, this marks the beginning index of the vulnerable value
+    	labelEnd = segment.indexOf("</b>") //every vuln has a remove bold tag, this marks the end of the vulnerable value
 
-   		exploit = segment[labelStart + 3: labelEnd] //extracted vuln val
-		vulnVals.push(exploit)// add the extracted vuln val to a list
+   		exploit = segment[labelStart + 3: labelEnd] //extracted vulnerable value
+		vulnVals.push(exploit)// add the extracted vulnerable value to a list
 
-end for
+end end for
 
-	killMe = vulnVals[0]
-	vulnVals.remove(killMe)
-	//print(char(10) + "discovered insecure values: " + vulnVals + char(10) + "testing exploits in memory zone: " + addr)
+	currentValue = vulnVals[0]
+	vulnVals.remove(currentValue)
+
 	for val in vulnVals
 		result = metaLib.overflow(addr, vulnVals[valSpot])
 		//add exploit type detection for file, computer, shell    //////////////////////////////////////////////// RESULT DETECTION //////////////////////
@@ -259,24 +223,21 @@ end for
 			end if
 		end if
 				if isrouter == false then
-				query = user_input("overwrite password to '123'? y/n")
+				query = user_input("overwrite password to '123'? y/n") //                              THIS NEEDS FIXING, CRASHES NO MATTER WHAT YOU ANSWER DD:
 				if query == "y" then
 				result = metaLib.overflow(addr, vulnVals[valspot], "123")
 				else if query == "n" then
 				print("password injection aborted")
 			end if
 			end if
-			//lan ip
-			//save result details for later use?
+
+			//todo: save result details for later use? Local DB of exploits to prevent a rescan every time
 			else
-
-				//new password
-
+				// ?? This is probably what's causing the crash
 			end if
 		if typaResult == "shell" then
 			sploits.push(result)
 	end if
-
 
 
 			if typaResult == "file" then
@@ -286,7 +247,7 @@ end for
 				files_in_dir = result.get_files
 				print(files_in_dir.len)
 				for file in files_in_dir
-					print(file.name + ":: " + file.get_content)
+					print(file.name + ":: " + file.get_content) // Has potential to be a really massive output, need to think of another way of showing file content. Save to a file?
 		end for
 		else
 		print("file obtained, printing name and contents")
@@ -297,24 +258,27 @@ end for
 			print("computer added to list")
 			sploits.push(result)
 			print(sploits)
-		end if                                                      ////////////////////////////////// END RESULT DETECTION, CONTINUE //////////////////////
+		end if                                                      
 		valSpot = valSpot + 1
 	end for
+
+//							     ////////////////////////////////// END RESULT DETECTION, PICK AND CHOOSE PAYLOADS //////////////////////
+
 spot = spot + 1
-vulnVals = [] //a NEW list of vulmnerable values is created, its flushed so previous mem zone exclusive vulns arent repeated
+vulnVals = [] //a NEW list of vulnerable values is created, it's flushed so previous mem zone vulns arent repeated
 valSpot = 0
 end for
 count = 0
-for sploit in sploits
+for sploit in sploits //print options, numbered
 	print("[" + count + "] " + sploits[count])
 	count = count + 1
 end for
 
-cont = true
+cont = true //once again using a weird name for the word "continue", for the same reason stated before
 while cont == true
-x = user_input("what woyd you like to do: ").to_int
+x = user_input("chooose an exploit: ").to_int //casted to an integer, probably crashes if a string is input, needs verification
 if typeof(x) != "number" then
-	print("bad response, try again. " + char(10) + "q to return to console")
+	print("bad response, try again." + char(10) + "q to return to console.")
 else 
 cont = false
 end if
@@ -322,22 +286,21 @@ if x == "q" then return
 end while
 
 
-
 exploit = sploits[x]
-if typeof(exploit) == "shell" then// identify shell exploit
+
+if typeof(exploit) == "shell" then      // identify shell exploit
 	exploit.start_terminal()
 	print("yello")
 	net_session = null
 	return console()
 end if
-if typeof(exploit) == "file" then //identifty fiile exploit then print contents or the name of the folder. I'll do folder contents later... probably
+if typeof(exploit) == "file" then       // identifty file exploit then print contents or the name of the folder. I'll do folder contents later... probably. Just prints file names for now.
 	print(exploit.get_content)
-	print("file printed")
 	else
-	if typeof(exploit) == "folder" then print(sploits[x].name)
+	if typeof(exploit) == "folder" then print(sploits[x].name) // unfinished
 end if
 
-if typeof(exploit) == "computer" then // identify computer exploit then print passwords for system and mails
+if typeof(exploit) == "computer" then   // identify computer exploit then print passwords for system and mails
 
 	print("searching for creds...")
 	passwdFile = exploit.File("/etc/passwd")
@@ -348,7 +311,7 @@ if typeof(exploit) == "computer" then // identify computer exploit then print pa
 	for file in homedir.get_folders
 		mailFile = exploit.File("/home/" + file.name + "/Config/Mail.txt")
 		if file.name == "guest" then
-		query = user_input("guest config folder obtained, are you sure you want to continue? (program will probably crash) y/n: ")
+		query = user_input("guest config folder obtained, are you sure you want to continue? (program will crash if empty) y/n: ")
 		if query == "y" then print(mailFile.get_content)
 		if query == "n" then return("process aborted")
 		end if
@@ -416,11 +379,11 @@ print("todo: getsystem")
 end function
 
 recon = function()
-//nmap and whois and nslookup idk
+//nmap + whois + nslookup + library version num (if applicable)
 print("todo: recon")
 end function
 
-whodat = function()
+whodat = function() //just because it sounds funnier than whois
 print("todo: whois")
 end function
 
@@ -428,7 +391,7 @@ ssh = function()
 print("todo: ssh")
 end function
 
-rshell_interface = function()
+rshell_interface = function() // VERY UNSTABLE
 print("Listening for upcoming connections...")
 
 shells = []
@@ -466,7 +429,7 @@ if isValid == 0 then return print("connect: invalid IP address")
 router = get_router(ip)
 if router == null then return print("connect: ip address not found")
 if router then
-	print("Connected to router at " + ip)
+	print("Connected to router at " + ip)			// ascii art so your mom and friends know cool stuff is happening
 	print(char(10) + "\   |   /")
 	print("_\__|__/_ ")
 	print("| . . . |")
@@ -490,7 +453,7 @@ print(format_columns(info) + "\n")
 end if
 
 print("Scan remote host for vulnerabilities? y/n")
-//ask to scan remote host, reprompt when given a bas answer
+//ask to scan remote host, reprompt when given a bad answer
 continyou = true
 
 while continyou == true
@@ -500,7 +463,7 @@ queryScan = user_input("connect> ")
 if queryScan == "y" or queryScan == "yes" or queryScan == "ye" or queryScan == "Y" then
 	return scanlib(ip)
 	continyou = false
-	//                                         come back ehre asdakslj fhaskjd fhaskljdfhaks jdhfksajl
+
 	else
 	if queryScan == "n" or queryScan == "no" or queryScan == "na" or queryScan == "N" then return print("connect: cancelled, returning to console")
 	print("bad answer, try again.")
@@ -533,7 +496,6 @@ isValid = is_valid_ip(ip)
 
 if isValid == 0 then return print("nmap: invalid IP address")
 if isValid == 1 then
-	//if ipAddress == "127.0.0.1" then ipAddress = get_shell.host_computer.local_ip
 	if isLanIp then
    router = get_router;
 else
@@ -569,7 +531,7 @@ for port in ports
 end for
 print(format_columns(info) + "\n")
 
-//check for a remote connection?
+//todo: check for a remote connection
 //if remoteConnection != true then print("home computer")
 
 end function
@@ -578,19 +540,22 @@ clear = function()
 clear_screen
 end function
 
-//begin checking libraries
+
 
 
 //                            /////////////////////////           MAIN           //////////////////////////
+
+//begin checking libraries
+
 missingLibs = []  //initiating the list of missing libraries
 
-metaxploit = include_lib("/lib/metaxploit.so")  //check if metaxploit is in it's default location
+metaxploit = include_lib("/lib/metaxploit.so")  //check if metaxploit is in its default location
 if not metaxploit then metaxploit = include_lib(current_path + "/metaxploit.so") //if metaxploit isn't in /lib check if it is in the current directory
-if not metaxploit then missingLibs.push("metaxploit.so") //add metaxploit to the list of missing libs
+if not metaxploit then missingLibs.push("metaxploit.so") //add metaxploit to the list of missing libs if missing
 
-crypto = include_lib("/lib/crypto.so")  //check if crypto is in it's default location
+crypto = include_lib("/lib/crypto.so")  //check if crypto is in its default location
 if not crypto then crypto = include_lib(current_path + "/crypto.so") //if crypto isn't in /lib check if it is in the current directory
-        if not crypto then missingLibs.push("crypto.so") //add crypto to the list of missing libs
+        if not crypto then missingLibs.push("crypto.so") //add crypto to the list of missing libs if missing
 
 if not crypto or not metaxploit then
         print("[X] required libraries not found in current directory or /lib!")
@@ -602,7 +567,7 @@ end for
 exit()
 end if
 
-//libraries success! start console
+// Dependency check ok, start console
 print("starting console!" + char(10))
 targetNetSesh = null
 while true
